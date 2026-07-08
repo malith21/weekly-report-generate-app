@@ -16,14 +16,17 @@ export default function NewReport() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-[60vh] fade-in-up">
+        <div className="text-center">
+          <div className="inline-block w-10 h-10 border-3 border-violet-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-sm text-slate-500 font-medium">Loading form...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto py-4 fade-in-up">
       <ReportForm />
     </div>
   )
