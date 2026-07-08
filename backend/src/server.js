@@ -12,10 +12,19 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
-// Routes - paths නිවැරදිව දෙන්න
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
+
+// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/reports', require('./routes/reports'));
 
@@ -24,9 +33,18 @@ app.get('/', (req, res) => {
   res.json({ message: 'API is running...' });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({ 
+    message: 'Something went wrong!',
+    error: err.message 
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`MongoDB URI: ${process.env.MONGO_URI}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📡 http://localhost:${PORT}`);
 });
