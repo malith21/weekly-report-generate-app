@@ -3,7 +3,7 @@ const { auth, authorize } = require('../middleware/auth');
 const Report = require('../models/Report');
 const router = express.Router();
 
-// Create report (Team Member only)
+// Create report
 router.post('/', auth, authorize('team_member', 'manager'), async (req, res) => {
   try {
     const report = new Report({
@@ -13,17 +13,19 @@ router.post('/', auth, authorize('team_member', 'manager'), async (req, res) => 
     await report.save();
     res.status(201).json(report);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error creating report' });
   }
 });
 
-// Get my reports (Team Member)
+// Get my reports
 router.get('/my-reports', auth, async (req, res) => {
   try {
     const reports = await Report.find({ userId: req.user._id })
       .sort({ weekStart: -1 });
     res.json(reports);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error fetching reports' });
   }
 });
@@ -44,6 +46,7 @@ router.get('/all', auth, authorize('manager'), async (req, res) => {
       .sort({ weekStart: -1 });
     res.json(reports);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error fetching reports' });
   }
 });
@@ -54,12 +57,10 @@ router.put('/:id', auth, async (req, res) => {
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ message: 'Report not found' });
     
-    // Check permission: only owner or manager can update
     if (req.user.role !== 'manager' && report.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Access denied' });
     }
     
-    // If submitting, set submittedAt
     if (req.body.status === 'submitted' && report.status === 'draft') {
       req.body.submittedAt = new Date();
     }
@@ -68,6 +69,7 @@ router.put('/:id', auth, async (req, res) => {
     await report.save();
     res.json(report);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error updating report' });
   }
 });
@@ -85,6 +87,7 @@ router.delete('/:id', auth, async (req, res) => {
     await report.deleteOne();
     res.json({ message: 'Report deleted' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error deleting report' });
   }
 });
